@@ -1923,6 +1923,7 @@ function! easycomplete#StoreCompleteSourceItems(plugin_name, result)
   if g:env_is_nvim
     let norm_menu_list = s:util_toolkit.final_normalize_menulist(a:result, a:plugin_name)
   else
+    " TODO here 这里在nvim中报错，需要再测试
     let norm_menu_list = s:FinalNormalizeMenulist(a:result, a:plugin_name)
   endif
   " call s:console(a:plugin_name, reltimestr(reltime(tt)))
@@ -2285,6 +2286,22 @@ function! s:FinalNormalizeMenulist(arr, plugin_name)
           \ 'plugin_name': a:plugin_name,
           \ 'sha256':      sha256_str,
           \ }
+    
+    " 处理 TypeScript 插件的 user_data
+    if a:plugin_name == "ts" && has_key(item, "user_data") && !empty(item.user_data)
+      try
+        let l:user_data_json = json_decode(item.user_data)
+        if type(l:user_data_json) == v:t_dict
+          " 将原始 user_data 中的字段复制到 r_user_data
+          for [l:key, l:value] in items(l:user_data_json)
+            let r_user_data[l:key] = l:value
+          endfor
+        endif
+      catch
+        " JSON 解析失败时忽略错误
+      endtry
+    endif
+    
     call add(l:menu_list, extend({
           \   'word': '',      'menu': '',
           \   'user_data': json_encode(r_user_data), 'equal': 0,
