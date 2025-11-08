@@ -19,10 +19,16 @@ function speed.final_normalize_menulist(arr, plugin_name)
   for _, item in ipairs(arr) do
     -- 这里item会转换为"table: 0x0109a29a00"，base64后无需截短
     local sha256_str = vim.base64.encode(tostring(item))
-    local r_user_data = {
+    local r_user_data = {}
+    local t_user_data = {
       plugin_name = plugin_name,
       sha256 = sha256_str
     }
+    if plugin_name == "ts" and item.user_data ~= nil then
+      r_user_data = vim.fn.extend(vim.fn.json_decode(item.user_data), t_user_data)
+    else
+      r_user_data = t_user_data
+    end
     table.insert(l_menu_list, vim.fn.extend({
           word = '',
           menu = '',
