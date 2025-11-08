@@ -1923,7 +1923,6 @@ function! easycomplete#StoreCompleteSourceItems(plugin_name, result)
   if g:env_is_nvim
     let norm_menu_list = s:util_toolkit.final_normalize_menulist(a:result, a:plugin_name)
   else
-    " TODO here 这里在nvim中报错，需要再测试
     let norm_menu_list = s:FinalNormalizeMenulist(a:result, a:plugin_name)
   endif
   " call s:console(a:plugin_name, reltimestr(reltime(tt)))

@@ -654,24 +654,27 @@ fn final_normalize_menulist(lua: &Lua,
 
         if cloned_plugin_name == "ts" {
             // 把ts里的user_data原有的字段存到r_user_data里
-            let user_data_string: String = item.get("user_data")?;
-            if !user_data_string.is_empty() {
-                match serde_json::from_str::<serde_json::Value>(&user_data_string) {
-                    Ok(user_data_json_value) => {
-                        if let serde_json::Value::Object(map) = user_data_json_value {
-                            for (key, value) in map.iter() {
-                                // 使用mlua的序列化功能将serde_json::Value转换为Lua值
-                                let lua_value: mlua::Value = lua.to_value(value)?;
-                                r_user_data.set(&**key, lua_value)?;
+            let user_data_value: mlua::Value = item.get("user_data")?;
+            if let mlua::Value::String(user_data_str) = user_data_value {
+                let user_data_string = user_data_str.to_str()?;
+                if !user_data_string.is_empty() {
+                    // 原有处理逻辑
+                    match serde_json::from_str::<serde_json::Value>(&user_data_string) {
+                        Ok(user_data_json_value) => {
+                            // console(&user_data_json_value);
+                            if let serde_json::Value::Object(map) = user_data_json_value {
+                                for (key, value) in map.iter() {
+                                    let lua_value: mlua::Value = lua.to_value(value)?;
+                                    r_user_data.set(&**key, lua_value)?;
+                                }
                             }
                         }
-                    }
-                    Err(_) => {
-                        // 如果JSON解析失败，可以选择记录日志或忽略错误
+                        Err(_) => {
+                            // 如果JSON解析失败，可以选择记录日志或忽略错误
+                        }
                     }
                 }
             }
-
         }
 
         r_user_data.set("plugin_name", cloned_plugin_name)?;
