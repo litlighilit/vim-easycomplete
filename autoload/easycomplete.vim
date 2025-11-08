@@ -2269,6 +2269,9 @@ function! s:SortTextComparatorByLength(...)
 endfunction
 
 function! s:FinalNormalizeMenulist(arr, plugin_name)
+  if exists("b:easycomplete_lsp_plugin") && !has_key(b:easycomplete_lsp_plugin, "name")
+    return a:arr
+  endif
   if exists("b:easycomplete_lsp_plugin") && a:plugin_name == b:easycomplete_lsp_plugin["name"]
     return a:arr
   endif
