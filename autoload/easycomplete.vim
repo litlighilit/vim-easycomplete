@@ -2974,7 +2974,11 @@ function! easycomplete#HoverNothing(msg)
   call s:log(a:msg)
   if s:Has_Shift_K_Map()
     let cw = expand('<cword>')
-    exec "h " . cw
+    try
+      exec "h " . cw
+    catch /^Vim\%((\a\+)\)\=:E149/
+      echo v:exception
+    endtry
   endif
 endfunction
 
